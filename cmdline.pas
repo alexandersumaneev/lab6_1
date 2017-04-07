@@ -16,10 +16,10 @@ uses crt,regexpr,btree;
 var
     cmdstr:string;
     symbols: set Of char;
-    cmd_list: array[0..4] of string; //список доступных команд
-    prev_cmd: string; //предыдущая команда
-    cmd: string; //команда после разбиения строки
-    cmd_arg: string; //аргумент команды
+    cmd_list: array[0..4] of string; //СЃРїРёСЃРѕРє РґРѕСЃС‚СѓРїРЅС‹С… РєРѕРјР°РЅРґ
+    prev_cmd: string; //РїСЂРµРґС‹РґСѓС‰Р°СЏ РєРѕРјР°РЅРґР°
+    cmd: string; //РєРѕРјР°РЅРґР° РїРѕСЃР»Рµ СЂР°Р·Р±РёРµРЅРёСЏ СЃС‚СЂРѕРєРё
+    cmd_arg: string; //Р°СЂРіСѓРјРµРЅС‚ РєРѕРјР°РЅРґС‹
     my_tree:PTree;
 
 procedure help();
@@ -27,7 +27,7 @@ var
     f: Text;
     s: string;
 begin
-    //выводит файл со справкой на экран
+    //РІС‹РІРѕРґРёС‚ С„Р°Р№Р» СЃРѕ СЃРїСЂР°РІРєРѕР№ РЅР° СЌРєСЂР°РЅ
     Assign(f,'help.txt');
     Reset(f);
     while not Eof(f) do
@@ -46,9 +46,9 @@ var
 begin
     WriteLn();
     space_pos := pos(' ',cmdstr);
-    if space_pos <> 0 then //если нашли пробел разбиваем команду на 2 части
+    if space_pos <> 0 then //РµСЃР»Рё РЅР°С€Р»Рё РїСЂРѕР±РµР» СЂР°Р·Р±РёРІР°РµРј РєРѕРјР°РЅРґСѓ РЅР° 2 С‡Р°СЃС‚Рё
     begin
-        cmd := Copy(cmdstr,1,space_pos - 1); //сама команда
+        cmd := Copy(cmdstr,1,space_pos - 1); //СЃР°РјР° РєРѕРјР°РЅРґР°
         cmd_arg:=Copy(cmdstr,space_pos + 1,Length(cmdstr));
         if cmd = 'delete' then
             if cmd_arg='tree' then
@@ -95,8 +95,8 @@ begin
     expr := '^(((help)|(print)|(delete tree))$)|((insert|find|delete)\s(0|(-(1|2|3|4|5|6|7|8|9)\d*)|(1|2|3|4|5|6|7|8|9)\d*))$';
     If not ExecRegExpr(expr,cmdstr) Then
     begin
-        //если команда не соответствует регулярному выражению expr
-        writeln(#10#13,'Команда   *',cmdstr,'*  не найдена');
+        //РµСЃР»Рё РєРѕРјР°РЅРґР° РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ СЂРµРіСѓР»СЏСЂРЅРѕРјСѓ РІС‹СЂР°Р¶РµРЅРёСЋ expr
+        writeln(#10#13,'РљРѕРјР°РЅРґР°   *',cmdstr,'*  РЅРµ РЅР°Р№РґРµРЅР°');
         cmdstr := '';
     end
     Else
@@ -114,7 +114,7 @@ begin
     del_spaces(cmdstr);
     for i:=0 to 4 do
     begin
-        if pos(cmdstr,cmd_list[i]) = 1 then //если нашли команду в списке команд
+        if pos(cmdstr,cmd_list[i]) = 1 then //РµСЃР»Рё РЅР°С€Р»Рё РєРѕРјР°РЅРґСѓ РІ СЃРїРёСЃРєРµ РєРѕРјР°РЅРґ
         begin
             cmdstr := cmd_list[i] + ' ';
             delline;
@@ -125,7 +125,7 @@ begin
     end;
 end;
 
-procedure arrow_up(); //выводит предыдущую команду
+procedure arrow_up(); //РІС‹РІРѕРґРёС‚ РїСЂРµРґС‹РґСѓС‰СѓСЋ РєРѕРјР°РЅРґСѓ
 begin
     cmdstr := prev_cmd;
     gotoxy(1,wherey);
@@ -144,9 +144,9 @@ procedure key_press();
 var
     key: char;
 begin
-    if Length(cmdstr) > 80 then //если слишком много вбили в консоль
+    if Length(cmdstr) > 80 then //РµСЃР»Рё СЃР»РёС€РєРѕРј РјРЅРѕРіРѕ РІР±РёР»Рё РІ РєРѕРЅСЃРѕР»СЊ
     begin
-        WriteLn(#10#13,'Максимальная длина строки 80 символов');
+        WriteLn(#10#13,'РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РґР»РёРЅР° СЃС‚СЂРѕРєРё 80 СЃРёРјРІРѕР»РѕРІ');
         cmdstr := '';
     end
     else

@@ -41,7 +41,7 @@ end;
 procedure print_tree(root :PTree);
 begin
     if root = nil then
-        WriteLn('Дерево пусто')
+        WriteLn('Р”РµСЂРµРІРѕ РїСѓСЃС‚Рѕ')
     else
     begin
         if root^.left <> nil then
@@ -71,7 +71,7 @@ var
     P, v :PTree;
 begin 
     if (root=nil) then
-        writeln('Такого элемента нет')
+        writeln('РўР°РєРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РЅРµС‚')
     else
         if x < root^.key then 
             root^.left := delete_item(root^.left, x)
