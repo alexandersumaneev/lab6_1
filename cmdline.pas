@@ -1,4 +1,6 @@
 {$mode objfpc}
+{$H+}
+{$codepage UTF8}
 (*
  * Project: lab6_1
  * User: alexa
@@ -152,7 +154,7 @@ begin
     else
     begin
         key := readkey();
-        If (key In symbols) Then
+        If (key in symbols) Then
         Begin
             write(key);
             cmdstr := cmdstr + key;

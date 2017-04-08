@@ -1,4 +1,6 @@
 {$mode objfpc}
+{$H+}
+{$codepage UTF8}
 (*
  * Project: lab6_1
  * User: alexa
