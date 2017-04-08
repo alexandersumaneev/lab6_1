@@ -8,10 +8,7 @@
  *)
 program main;
 uses btree,cmdline;
-var
-my:PTree;
 
 begin
-    my:=nil;
     init();
 end.
