@@ -122,7 +122,6 @@ begin
         print_f(cmd_arg);
     if cmd = 'help' then
         help_f(cmd_arg);
-
 end;
 
 begin
