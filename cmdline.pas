@@ -168,7 +168,6 @@ begin
     add_list(cmdstr,prev_cmd_list);
     curr_cmd:=prev_cmd_list;
     del_spaces(cmdstr);
-    clrscr;
     if not ExecRegExpr('(help|print|delete|insert|find).*',cmdstr) Then
     begin //Если команда не соответствует регулярному выражению expr
         writeln(#10#13,'Команда   *',cmdstr,'*  не найдена');
@@ -178,6 +177,7 @@ begin
     begin
         split();
         cmdstr := '';
+        WriteLn();
     end;
 end;
 
