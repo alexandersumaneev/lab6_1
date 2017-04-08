@@ -15,7 +15,7 @@ implementation
 
 uses crt,regexpr,btree;
 
-const number = '0|(-(1|2|3|4|5|6|7|8|9)\d*)|((1|2|3|4|5|6|7|8|9)\d*)';
+const number = '^(0|(-(1|2|3|4|5|6|7|8|9)\d*)|((1|2|3|4|5|6|7|8|9)\d*))$';
 
 var
     cmdstr:string;
@@ -44,7 +44,7 @@ procedure delete_f(arg: string);
 var
     i:integer;
 begin
-    if not ExecRegExpr('(tree)|' + number, arg) then
+    if not ExecRegExpr('(tree$)|' + number, arg) then
         WriteLn('Недопустимый аргумент команды delete')
     else if arg = 'tree' then
         delete_tree(my_tree)
@@ -83,7 +83,7 @@ end;
 
 procedure print_f(arg: string);
 begin
-    if not ExecRegExpr('pre|inf|pos', arg) then
+    if not ExecRegExpr('(pre|inf|pos)$', arg) then
         WriteLn('Недопустимый аргумент команды print')
     else
     begin
