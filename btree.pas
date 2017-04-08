@@ -17,13 +17,13 @@ type
         key : integer;
         left, right :PTree
     end;
-    procedure insert_item(var root :PTree; key: integer); //вставить элемент в дерево
-    procedure print_tree_inf(root :PTree); //вывести элементы на экран в инфиксном порядке
-    procedure print_tree_pre(root :PTree); //вывести элементы на экран в префикном порядке
-    procedure print_tree_pos(root :PTree); //вывести элементы на экран в постфикном порядке
-    procedure delete_tree(var root: PTree); //удалить все дерево
-    function find_item(root :PTree; key: integer) : boolean;  //найти элемент в дереве
-    procedure delete_item(key: integer; var root: PTree);  //удалить элемент из дерева
+    procedure insert_item(var root :PTree; key: integer); //Вставить элемент в дерево
+    procedure print_tree_inf(root :PTree); //Вывести элементы на экран в инфиксном порядке
+    procedure print_tree_pre(root :PTree); //Вывести элементы на экран в префикном порядке
+    procedure print_tree_pos(root :PTree); //Вывести элементы на экран в постфикном порядке
+    procedure delete_tree(var root: PTree); //Удалить все дерево
+    function find_item(root :PTree; key: integer) : boolean;  //Найти элемент в дереве
+    procedure delete_item(key: integer; var root: PTree);  //Удалить элемент из дерева
 
 implementation
 

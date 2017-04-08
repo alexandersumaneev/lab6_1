@@ -107,8 +107,23 @@ end;
 procedure split();
 var
     space_pos: Integer;
-    cmd: string; //команда после разбиения строки
+    cmd: string; //Команда после разбиения строки
     cmd_arg: string; //Аргумент команды
+
+procedure cmd_exec();
+begin
+    if cmd = 'delete' then
+        delete_f(cmd_arg);
+    if cmd = 'insert' then
+        insert_f(cmd_arg);
+    if cmd = 'find' then
+        find_f(cmd_arg);
+    if cmd = 'print' then
+        print_f(cmd_arg);
+    if cmd = 'help' then
+        help_f(cmd_arg);
+end;
+
 begin
     WriteLn();
     space_pos := pos(' ',cmdstr);
@@ -117,30 +132,12 @@ begin
     begin
         cmd := Copy(cmdstr,1,space_pos - 1);
         cmd_arg:=Copy(cmdstr,space_pos + 1,Length(cmdstr));
-        if cmd = 'delete' then
-            delete_f(cmd_arg);
-        if cmd = 'insert' then
-            insert_f(cmd_arg);
-        if cmd = 'find' then
-           find_f(cmd_arg);
-        if cmd = 'print' then
-            print_f(cmd_arg);
-        if cmd = 'help' then
-            help_f(cmd_arg);
+        cmd_exec();
     end
     else
     begin
         cmd:=cmdstr;
-        if cmd = 'delete' then
-            delete_f(cmd_arg);
-        if cmd = 'insert' then
-            insert_f(cmd_arg);
-        if cmd = 'find' then
-            find_f(cmd_arg);
-        if cmd = 'print' then
-            print_f(cmd_arg);
-        if cmd = 'help' then
-            help_f(cmd_arg);
+        cmd_exec();
     end;
 end;
 
