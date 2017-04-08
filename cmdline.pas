@@ -43,6 +43,7 @@ end;
 procedure delete_f(arg: string);
 var
     i:integer;
+    s:string;
 begin
     if not ExecRegExpr('(tree$)|' + number, arg) then
         WriteLn('Недопустимый аргумент команды delete')
@@ -51,33 +52,47 @@ begin
     else
     begin
         Val(arg,i);
-        delete_item(i,my_tree);
+        str(i,s);
+        if s = arg then
+            delete_item(i,my_tree)
+        else
+            WriteLn('Число не соответствует типу Integer');
     end;
 end;
 
 procedure insert_f(arg: string);
 var
     i:integer;
+    s:string;
 begin
     if not ExecRegExpr(number, arg) then
         WriteLn('Недопустимый аргумент команды insert')
     else
     begin
         Val(arg,i);
-        insert_item(my_tree,i);
+        str(i,s);
+        if s = arg then
+            insert_item(i,my_tree)
+        else
+            WriteLn('Число не соответствует типу Integer');
     end;
 end;
 
 procedure find_f(arg: string);
 var
     i:integer;
+    s:string;
 begin
     if not ExecRegExpr(number, arg) then
         WriteLn('Недопустимый аргумент команды find')
     else
     begin
         Val(arg,i);
-        WriteLn(find_item(my_tree,i));
+        str(i,s);
+        if s = arg then
+            find_item(i,my_tree)
+        else
+            WriteLn('Число не соответствует типу Integer');
     end;
 end;
 

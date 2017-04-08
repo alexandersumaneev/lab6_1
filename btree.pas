@@ -17,17 +17,17 @@ type
         key : integer;
         left, right :PTree
     end;
-    procedure insert_item(var root :PTree; key: integer); //Вставить элемент в дерево
+    procedure insert_item(key: integer; var root :PTree); //Вставить элемент в дерево
     procedure print_tree_inf(root :PTree); //Вывести элементы на экран в инфиксном порядке
     procedure print_tree_pre(root :PTree); //Вывести элементы на экран в префикном порядке
     procedure print_tree_pos(root :PTree); //Вывести элементы на экран в постфикном порядке
     procedure delete_tree(var root: PTree); //Удалить все дерево
-    function find_item(root :PTree; key: integer) : boolean;  //Найти элемент в дереве
+    function find_item(key: integer; root :PTree) : boolean;  //Найти элемент в дереве
     procedure delete_item(key: integer; var root: PTree);  //Удалить элемент из дерева
 
 implementation
 
-procedure insert_item(var root :PTree; key: integer);
+procedure insert_item(key: integer; var root :PTree);
 begin
     if root = nil then
     begin
@@ -38,9 +38,9 @@ begin
     end
     else
         if key < root^.key then
-            insert_item(root^.left, key)
+            insert_item(key, root^.left)
         else
-            insert_item(root^.right, key)
+            insert_item(key, root^.right);
 end;
 
 procedure print_tree_inf(root :PTree);
@@ -85,7 +85,7 @@ begin
     end;
 end;
 
-function find_item(root :PTree; key: integer) : boolean;
+function find_item(key: integer; root :PTree) : boolean;
 begin
     if root=nil then
         find_item := false
@@ -94,9 +94,9 @@ begin
             find_item := True
         else
             if key < root^.key then
-                find_item := find_item(root^.left, key)
+                find_item := find_item(key, root^.left)
             else
-                find_item := find_item(root^.right, key)
+                find_item := find_item(key, root^.right);
 end;
 
 
