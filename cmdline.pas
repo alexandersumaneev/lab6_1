@@ -77,7 +77,7 @@ begin
     else
     begin
         Val(arg,i);
-        find_item(my_tree,i);
+        WriteLn(find_item(my_tree,i));
     end;
 end;
 
@@ -122,6 +122,7 @@ begin
         print_f(cmd_arg);
     if cmd = 'help' then
         help_f(cmd_arg);
+
 end;
 
 begin
