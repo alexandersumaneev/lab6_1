@@ -90,7 +90,7 @@ begin
         Val(arg,i);
         str(i,s);
         if s = arg then
-            find_item(i,my_tree)
+            WriteLn(find_item(i,my_tree))
         else
             WriteLn('Число не соответствует типу Integer');
     end;
