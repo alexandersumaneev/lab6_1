@@ -3,7 +3,7 @@
 {$codepage UTF8}
 (*
  * Project: lab6_1
- * User: alexa
+ * User: alexaB
  * Date: 07.04.2017
  *)
 program main;

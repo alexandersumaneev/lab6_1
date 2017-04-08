@@ -15,13 +15,13 @@ implementation
 
 uses crt,regexpr,btree;
 
+const number = '0|(-(1|2|3|4|5|6|7|8|9)\d*)|((1|2|3|4|5|6|7|8|9)\d*)';
+
 var
     cmdstr:string;
     symbols: set Of char;
-    cmd_list: array[0..4] of string; //список доступных команд
-    prev_cmd: string; //предыдущая команда
-    cmd: string; //команда после разбиения строки
-    cmd_arg: string; //аргумент команды
+    cmd_list: array[0..4] of string; //Список доступных команд
+    prev_cmd: string; //Предыдущая команда
     my_tree:PTree;
 
 procedure help();
@@ -29,7 +29,7 @@ var
     f: Text;
     s: string;
 begin
-    //выводит файл со справкой на экран
+    //Выводит файл со справкой на экран
     Assign(f,'help.txt');
     Reset(f);
     while not Eof(f) do
@@ -40,44 +40,107 @@ begin
     Close(f);
 end;
 
+procedure delete_f(arg: string);
+var
+    i:integer;
+begin
+    if not ExecRegExpr('(tree)|' + number, arg) then
+        WriteLn('Недопустимый аргумент команды delete')
+    else if arg = 'tree' then
+        delete_tree(my_tree)
+    else
+    begin
+        Val(arg,i);
+        delete_item(i,my_tree);
+    end;
+end;
+
+procedure insert_f(arg: string);
+var
+    i:integer;
+begin
+    if not ExecRegExpr(number, arg) then
+        WriteLn('Недопустимый аргумент команды insert')
+    else
+    begin
+        Val(arg,i);
+        insert_item(my_tree,i);
+    end;
+end;
+
+procedure find_f(arg: string);
+var
+    i:integer;
+begin
+    if not ExecRegExpr(number, arg) then
+        WriteLn('Недопустимый аргумент команды find')
+    else
+    begin
+        Val(arg,i);
+        find_item(my_tree,i);
+    end;
+end;
+
+procedure print_f(arg: string);
+begin
+    if not ExecRegExpr('pre|inf|pos', arg) then
+        WriteLn('Недопустимый аргумент команды print')
+    else
+    begin
+        if arg = 'inf' then
+        print_tree_inf(my_tree);
+        if arg = 'pre' then
+            print_tree_pre(my_tree);
+        if arg = 'pos' then
+            print_tree_pos(my_tree);
+    end;
+end;
+
+procedure help_f(arg: string);
+begin
+    if arg <> '' then
+        WriteLn('У команды help нет аргументов')
+    else
+      help();
+end;
 
 procedure split();
 var
     space_pos: Integer;
-    cmd_value:Integer;
+    cmd: string; //команда после разбиения строки
+    cmd_arg: string; //Аргумент команды
 begin
     WriteLn();
     space_pos := pos(' ',cmdstr);
-    if space_pos <> 0 then //если нашли пробел разбиваем команду на 2 части
+    cmd_arg:='';
+    if space_pos <> 0 then //Если нашли пробел разбиваем команду на 2 части
     begin
-        cmd := Copy(cmdstr,1,space_pos - 1); //сама команда
+        cmd := Copy(cmdstr,1,space_pos - 1);
         cmd_arg:=Copy(cmdstr,space_pos + 1,Length(cmdstr));
         if cmd = 'delete' then
-            if cmd_arg='tree' then
-                delete_tree(my_tree)
-            else
-                begin
-                    Val(cmd_arg,cmd_value);
-                    delete_item(my_tree,cmd_value);
-                end;
+            delete_f(cmd_arg);
         if cmd = 'insert' then
-            begin
-                Val(cmd_arg,cmd_value);
-                insert_item(my_tree,cmd_value);
-            end;
+            insert_f(cmd_arg);
         if cmd = 'find' then
-            begin
-                Val(cmd_arg,cmd_value);
-                WriteLn(find_item(my_tree,cmd_value));
-            end;
+           find_f(cmd_arg);
+        if cmd = 'print' then
+            print_f(cmd_arg);
+        if cmd = 'help' then
+            help_f(cmd_arg);
     end
     else
     begin
-        cmd := cmdstr;
-        if cmd = 'help' then
-            help();
+        cmd:=cmdstr;
+        if cmd = 'delete' then
+            delete_f(cmd_arg);
+        if cmd = 'insert' then
+            insert_f(cmd_arg);
+        if cmd = 'find' then
+            find_f(cmd_arg);
         if cmd = 'print' then
-            print_tree(my_tree);
+            print_f(cmd_arg);
+        if cmd = 'help' then
+            help_f(cmd_arg);
     end;
 end;
 
@@ -89,19 +152,15 @@ begin
 end;
 
 procedure enter();
-var
-    expr: string;
 begin
     prev_cmd := cmdstr;
     del_spaces(cmdstr);
-    expr := '^(((help)|(print)|(delete tree))$)|((insert|find|delete)\s(0|(-(1|2|3|4|5|6|7|8|9)\d*)|(1|2|3|4|5|6|7|8|9)\d*))$';
-    If not ExecRegExpr(expr,cmdstr) Then
-    begin
-        //если команда не соответствует регулярному выражению expr
+    if not ExecRegExpr('(help|print|delete|insert|find).*',cmdstr) Then
+    begin //Если команда не соответствует регулярному выражению expr
         writeln(#10#13,'Команда   *',cmdstr,'*  не найдена');
         cmdstr := '';
     end
-    Else
+    else
     begin
         split();
         cmdstr := '';
@@ -116,7 +175,7 @@ begin
     del_spaces(cmdstr);
     for i:=0 to 4 do
     begin
-        if pos(cmdstr,cmd_list[i]) = 1 then //если нашли команду в списке команд
+        if pos(cmdstr,cmd_list[i]) = 1 then //Если нашли команду в списке команд
         begin
             cmdstr := cmd_list[i] + ' ';
             delline;
@@ -127,7 +186,7 @@ begin
     end;
 end;
 
-procedure arrow_up(); //выводит предыдущую команду
+procedure arrow_up(); //Выводит предыдущую команду
 begin
     cmdstr := prev_cmd;
     gotoxy(1,wherey);
@@ -146,7 +205,7 @@ procedure key_press();
 var
     key: char;
 begin
-    if Length(cmdstr) > 80 then //если слишком много вбили в консоль
+    if Length(cmdstr) > 80 then //Если слишком много вбили в консоль
     begin
         WriteLn(#10#13,'Максимальная длина строки 80 символов');
         cmdstr := '';
@@ -173,6 +232,7 @@ begin
             End;
     end;
 end;
+
 
 procedure init();
 begin

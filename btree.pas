@@ -14,102 +14,153 @@ interface
 type
     PTree = ^BinTree;
     BinTree = record
-        key : integer; 
+        key : integer;
         left, right :PTree
     end;
-    procedure insert_item(var root :PTree; x : integer);
-    procedure print_tree(root :PTree);
-    procedure delete_tree(var root: PTree);
-    function find_item(root :PTree; x : integer) : boolean;
-    function delete_item(root:PTree; x: integer) :PTree;
+    procedure insert_item(var root :PTree; key: integer); //вставить элемент в дерево
+    procedure print_tree_inf(root :PTree); //вывести элементы на экран в инфиксном порядке
+    procedure print_tree_pre(root :PTree); //вывести элементы на экран в префикном порядке
+    procedure print_tree_pos(root :PTree); //вывести элементы на экран в постфикном порядке
+    procedure delete_tree(var root: PTree); //удалить все дерево
+    function find_item(root :PTree; key: integer) : boolean;  //найти элемент в дереве
+    procedure delete_item(key: integer; var root: PTree);  //удалить элемент из дерева
 
 implementation
 
-procedure insert_item(var root :PTree; x : integer);
+procedure insert_item(var root :PTree; key: integer);
 begin
-    if root = nil
-    then begin
+    if root = nil then
+    begin
         new(root);
         root^.left := nil;
         root^.right := nil;
-        root^.key := x
+        root^.key := key
     end
-    else if x < root^.key then 
-        insert_item(root^.left, x)
-    else 
-        insert_item(root^.right, x)
+    else
+        if key < root^.key then
+            insert_item(root^.left, key)
+        else
+            insert_item(root^.right, key)
 end;
 
-procedure print_tree(root :PTree);
+procedure print_tree_inf(root :PTree);
 begin
     if root = nil then
         WriteLn('Дерево пусто')
     else
     begin
         if root^.left <> nil then
-            print_tree(root^.left);
+            print_tree_inf(root^.left);
         Writeln(root^.key);
         if root^.right <> nil then
-            print_tree(root^.right);
+            print_tree_inf(root^.right);
     end;
 end;
 
-function find_item(root :PTree; x : integer) : boolean;
+procedure print_tree_pre(root :PTree);
+begin
+    if root = nil then
+        WriteLn('Дерево пусто')
+    else
+    begin
+        Writeln(root^.key);
+        if root^.left <> nil then
+            print_tree_pre(root^.left);
+        if root^.right <> nil then
+            print_tree_pre(root^.right);
+    end;
+end;
+
+procedure print_tree_pos(root :PTree);
+begin
+    if root = nil then
+        WriteLn('Дерево пусто')
+    else
+    begin
+        if root^.left <> nil then
+            print_tree_pos(root^.left);
+        if root^.right <> nil then
+            print_tree_pos(root^.right);
+        Writeln(root^.key);
+    end;
+end;
+
+function find_item(root :PTree; key: integer) : boolean;
 begin
     if root=nil then
         find_item := false
-    else 
-        if root^.key=x then 
+    else
+        if root^.key=key then
             find_item := True
         else
-            if x < root^.key then
-                find_item := find_item(root^.left, x)
+            if key < root^.key then
+                find_item := find_item(root^.left, key)
             else
-                find_item := find_item(root^.right, x)
+                find_item := find_item(root^.right, key)
 end;
 
-function delete_item(root:PTree; x: integer) :PTree;
+
+// Удаляет минимальный элемент в правом поддереве, возвращает его ключ
+function delete_min_item(var root: PTree): Integer;
 var
-    P, v :PTree;
-begin 
-    if (root=nil) then
-        writeln('Такого элемента нет')
+    p:PTree ;
+begin
+    if root^.left = nil then
+    begin
+        p:=root;
+        delete_min_item:=root^.key;
+        root:=root^.right;
+        Dispose(p);
+    end
     else
-        if x < root^.key then 
-            root^.left := delete_item(root^.left, x)
-        else
-        if x > root^.key then
-            root^.right := delete_item(root^.right, x)
-        else
-        begin
-            P := root;
-            if root^.right=nil
-            then root:=root^.left
-            else
-                if root^.left=nil then
-                    root:=root^.right
-                else
-                begin 
-                    v := root^.left;
-                    if v^.right <> nil then
-                    begin 
-                        while v^.right^.right <> nil do 
-                            v:= v^.right;
-                        root^.key := v^.right^.key;
-                        P := v^.right;
-                        v^.right :=v^.right^.left;
-                    end
-                    else 
-                    begin
-                        root^.key := v^.key;
-                        P := v;
-                        root^.left:= root^.left^.left 
-                    end;
-                end;
-            dispose(P);
-        end;
-    delete_item := root
+        delete_min_item:=delete_min_item(root^.left);
 end;
+
+procedure delete_item(key: Integer; var root: PTree);
+var
+    p:PTree;
+begin
+    if root <> nil then
+    begin
+
+        // Ищем элемент--------------------------------------------
+        if key < root^.key then
+            delete_item(key,root^.left)
+        else if key > root^.key then
+            delete_item(key,root^.right)
+        //---------------------------------------------------------
+
+        // Если он является листом, просто удалим его--------------
+        else if (root^.left = nil) and (root^.right = nil) then
+        begin
+            Dispose(root);
+            root:=nil;
+        end
+        //---------------------------------------------------------
+
+        //Если у него есть только одно поддерево-------------------
+        else if root^.left = nil then
+        begin
+            p:=root;
+            root:=root^.right;
+            Dispose(p);
+        end
+        else if root^.right = nil then
+        begin
+            p:=root;
+            root:=root^.left;
+            Dispose(p);
+        end
+         //---------------------------------------------------------
+
+        else //Если есть оба поддерева, удаляем минимальный элемент
+            //в правом поддереве, меняем ключи
+            root^.key:=delete_min_item(root^.right);
+    end
+    else
+        WriteLn('Такого элемента нет');
+end;
+
 
 procedure delete_tree(var root: PTree);
 begin
