@@ -164,12 +164,15 @@ end;
 
 procedure delete_tree(var root: PTree);
 begin
-    if root^.left <> nil then
-        delete_tree(root^.left);
-    if root^.right <> nil then
-        delete_tree(root^.right);
-    Dispose(root);
-    root := nil;
+    if root <> nil then
+    begin
+        if root^.left <> nil then
+            delete_tree(root^.left);
+        if root^.right <> nil then
+            delete_tree(root^.right);
+        Dispose(root);
+        root := nil;
+    end;
 end;
 
 end.

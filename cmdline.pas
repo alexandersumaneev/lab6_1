@@ -13,7 +13,7 @@ interface
 
 implementation
 
-uses crt,regexpr,btree;
+uses crt,regexpr,btree,list;
 
 const number = '^(0|(-(1|2|3|4|5|6|7|8|9)\d*)|((1|2|3|4|5|6|7|8|9)\d*))$';
 
@@ -21,7 +21,7 @@ var
     cmdstr:string;
     symbols: set Of char;
     cmd_list: array[0..4] of string; //Список доступных команд
-    prev_cmd: string; //Предыдущая команда
+    prev_cmd_list,curr_cmd:PCList;
     my_tree:PTree;
 
 procedure help();
@@ -165,7 +165,9 @@ end;
 
 procedure enter();
 begin
-    prev_cmd := cmdstr;
+  //  prev_cmd := cmdstr;
+    add_list(cmdstr,prev_cmd_list);
+    curr_cmd:=prev_cmd_list;
     del_spaces(cmdstr);
     if not ExecRegExpr('(help|print|delete|insert|find).*',cmdstr) Then
     begin //Если команда не соответствует регулярному выражению expr
@@ -198,12 +200,32 @@ begin
     end;
 end;
 
+procedure exit();
+begin
+    del_list(prev_cmd_list);
+    delete_tree(my_tree);
+    WriteLn(#10#13,'Программа завершена');
+    readkey;
+    halt();
+end;
+
+
 procedure arrow_up(); //Выводит предыдущую команду
 begin
-    cmdstr := prev_cmd;
+    cmdstr:=get_cmd(curr_cmd);
     gotoxy(1,wherey);
     clreol;
     write(cmdstr);
+    curr_cmd:=prev_cmd(curr_cmd);
+end;
+
+procedure arrow_down(); //Выводит предыдущую команду
+begin
+    cmdstr:=get_cmd(curr_cmd);
+    gotoxy(1,wherey);
+    clreol;
+    write(cmdstr);
+    curr_cmd:=next_cmd(curr_cmd);
 end;
 
 Procedure backspace();
@@ -231,7 +253,7 @@ begin
             cmdstr := cmdstr + key;
         End;
         If (key = #27) Then //Esc
-            Halt();
+            exit();
         If (key = #13) Then
             enter();
         If (key = #9) Then
@@ -241,6 +263,7 @@ begin
         If (key = #0) Then
             Case readkey() Of
             #72: arrow_up();
+            #80: arrow_down();
             End;
     end;
 end;
@@ -256,6 +279,9 @@ begin
 end;
 
 begin
+    my_tree:=nil;
+    prev_cmd_list:=nil;
+    curr_cmd:=nil;
     cmd_list[0] := 'help';
     cmd_list[1] := 'insert';
     cmd_list[2] := 'print';
