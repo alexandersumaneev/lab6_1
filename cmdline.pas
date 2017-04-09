@@ -20,7 +20,7 @@ const number = '^(0|(-(1|2|3|4|5|6|7|8|9)\d*)|((1|2|3|4|5|6|7|8|9)\d*))$';
 var
     cmdstr:string;
     symbols: set Of char;
-    cmd_list: array[0..4] of string; //Список доступных команд
+    cmd_list: array[0..5] of string; //Список доступных команд
     prev_cmd_list,curr_cmd:PCList;
     my_tree:PTree;
 
@@ -119,6 +119,17 @@ begin
       help();
 end;
 
+procedure clear_f(arg: string);
+begin
+    if arg <> '' then
+        WriteLn('У команды clear нет аргументов')
+    else
+        begin
+            clrscr;
+            cmdstr:='';
+        end;
+end;
+
 procedure split();
 var
     space_pos: Integer;
@@ -137,6 +148,8 @@ begin
         print_f(cmd_arg);
     if cmd = 'help' then
         help_f(cmd_arg);
+    if cmd = 'clearscr' then
+        clear_f(cmd_arg);
 end;
 
 begin
@@ -168,7 +181,7 @@ begin
     add_list(cmdstr,prev_cmd_list);
     curr_cmd:=prev_cmd_list;
     del_spaces(cmdstr);
-    if not ExecRegExpr('(help|print|delete|insert|find).*',cmdstr) Then
+    if not ExecRegExpr('(clearscr|help|print|delete|insert|find).*',cmdstr) Then
     begin //Если команда не соответствует регулярному выражению expr
         writeln(#10#13,'Команда   *',cmdstr,'*  не найдена');
         cmdstr := '';
@@ -186,7 +199,7 @@ var
     i: Integer;
 begin
     del_spaces(cmdstr);
-    for i:=0 to 4 do
+    for i:=0 to 5 do
     begin
         if pos(cmdstr,cmd_list[i]) = 1 then //Если нашли команду в списке команд
         begin
@@ -286,5 +299,6 @@ begin
     cmd_list[2] := 'print';
     cmd_list[3] := 'find';
     cmd_list[4] := 'delete';
+    cmd_list[5] :='clearscr';
     symbols := ['a'..'z','0' .. '9',' ','-'];
 end.
