@@ -199,7 +199,7 @@ begin
     end;
 end;
 
-procedure exit();
+procedure exit_f();
 begin
     del_list(prev_cmd_list);
     delete_tree(my_tree);
@@ -252,7 +252,7 @@ begin
             cmdstr := cmdstr + key;
         End;
         If (key = #27) Then //Esc
-            exit();
+            exit_f();
         If (key = #13) Then
             enter();
         If (key = #9) Then
