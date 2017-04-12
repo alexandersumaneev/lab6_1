@@ -3,7 +3,7 @@
 {$codepage UTF8}
 (*
  * Project: lab6_1
- * User: alexa
+ * User: alexander_sumaneev
  * Date: 07.04.2017
  *)
 unit cmdline;
@@ -15,14 +15,15 @@ implementation
 
 uses crt,regexpr,btree,list;
 
-const number = '^(0|(-(1|2|3|4|5|6|7|8|9)\d*)|((1|2|3|4|5|6|7|8|9)\d*))$';
+const
+    number = '^(0|(-(1|2|3|4|5|6|7|8|9)\d*)|((1|2|3|4|5|6|7|8|9)\d*))$';
 
 var
-    cmdstr:string;
-    symbols: set Of char;
+    cmdstr: string;
+    symbols: set Of Char;
     cmd_list: array[0..5] of string; //Список доступных команд
-    prev_cmd_list,curr_cmd:PCList;
-    my_tree:PTree;
+    prev_cmd_list, curr_cmd: PCList;
+    my_tree: PTree;
 
 procedure help();
 var
@@ -42,8 +43,8 @@ end;
 
 procedure delete_f(arg: string);
 var
-    i:integer;
-    s:string;
+    i: Integer;
+    s: string;
 begin
     if not ExecRegExpr('(tree$)|' + number, arg) then
         WriteLn('Недопустимый аргумент команды delete')
@@ -62,8 +63,8 @@ end;
 
 procedure insert_f(arg: string);
 var
-    i:integer;
-    s:string;
+    i: integer;
+    s: string;
 begin
     if not ExecRegExpr(number, arg) then
         WriteLn('Недопустимый аргумент команды insert')
@@ -80,8 +81,8 @@ end;
 
 procedure find_f(arg: string);
 var
-    i:integer;
-    s:string;
+    i: integer;
+    s: string;
 begin
     if not ExecRegExpr(number, arg) then
         WriteLn('Недопустимый аргумент команды find')
@@ -103,7 +104,7 @@ begin
     else
     begin
         if arg = 'inf' then
-        print_tree_inf(my_tree);
+            print_tree_inf(my_tree);
         if arg = 'pre' then
             print_tree_pre(my_tree);
         if arg = 'pos' then
@@ -116,7 +117,7 @@ begin
     if arg <> '' then
         WriteLn('У команды help нет аргументов')
     else
-      help();
+        help();
 end;
 
 procedure clear_f(arg: string);
@@ -124,10 +125,10 @@ begin
     if arg <> '' then
         WriteLn('У команды clear нет аргументов')
     else
-        begin
-            clrscr;
-            cmdstr:='';
-        end;
+    begin
+        clrscr;
+        cmdstr := '';
+    end;
 end;
 
 procedure split();
@@ -155,34 +156,35 @@ end;
 begin
     WriteLn();
     space_pos := pos(' ',cmdstr);
-    cmd_arg:='';
+    cmd_arg := '';
     if space_pos <> 0 then //Если нашли пробел разбиваем команду на 2 части
     begin
         cmd := Copy(cmdstr,1,space_pos - 1);
-        cmd_arg:=Copy(cmdstr,space_pos + 1,Length(cmdstr));
+        cmd_arg := Copy(cmdstr,space_pos + 1,Length(cmdstr));
         cmd_exec();
     end
     else
     begin
-        cmd:=cmdstr;
+        cmd := cmdstr;
         cmd_exec();
     end;
 end;
 
-procedure del_spaces(var cmd:string);
+procedure del_spaces(var cmd: string);
 begin
-    cmd:=ReplaceRegExpr('(^\s*)|(\s*$)/(\s\s)',cmd,'',false);
-    cmd:=ReplaceRegExpr('\s+',cmd,' ',false);
-    cmd:=ReplaceRegExpr('\s$',cmd,'',false);
+    cmd := ReplaceRegExpr('(^\s*)|(\s*$)/(\s\s)',cmd,'',false);
+    cmd := ReplaceRegExpr('\s+',cmd,' ',false);
+    cmd := ReplaceRegExpr('\s$',cmd,'',false);
 end;
 
 procedure enter();
 begin
     add_list(cmdstr,prev_cmd_list);
-    curr_cmd:=prev_cmd_list;
+    curr_cmd := prev_cmd_list;
     del_spaces(cmdstr);
     if not ExecRegExpr('(clearscr|help|print|delete|insert|find).*',cmdstr) Then
-    begin //Если команда не соответствует регулярному выражению expr
+    begin
+        //Если команда не соответствует регулярному выражению expr
         writeln(#10#13,'Команда   *',cmdstr,'*  не найдена');
         cmdstr := '';
     end
@@ -224,20 +226,20 @@ end;
 
 procedure arrow_up(); //Выводит предыдущую команду
 begin
-    cmdstr:=get_cmd(curr_cmd);
+    cmdstr := get_cmd(curr_cmd);
     gotoxy(1,wherey);
     clreol;
     write(cmdstr);
-    curr_cmd:=prev_cmd(curr_cmd);
+    curr_cmd := prev_cmd(curr_cmd);
 end;
 
 procedure arrow_down(); //Выводит предыдущую команду
 begin
-    cmdstr:=get_cmd(curr_cmd);
+    cmdstr := get_cmd(curr_cmd);
     gotoxy(1,wherey);
     clreol;
     write(cmdstr);
-    curr_cmd:=next_cmd(curr_cmd);
+    curr_cmd := next_cmd(curr_cmd);
 end;
 
 Procedure backspace();
@@ -268,7 +270,7 @@ begin
             exit_f();
         If (key = #13) Then
             enter();
-        If (key = #9) Then
+        If (key = #9) then
             tab();
         If (key = #8) Then
             backspace();
@@ -291,14 +293,14 @@ begin
 end;
 
 begin
-    my_tree:=nil;
-    prev_cmd_list:=nil;
-    curr_cmd:=nil;
+    my_tree := nil;
+    prev_cmd_list := nil;
+    curr_cmd := nil;
     cmd_list[0] := 'help';
     cmd_list[1] := 'insert';
     cmd_list[2] := 'print';
     cmd_list[3] := 'find';
     cmd_list[4] := 'delete';
-    cmd_list[5] :='clearscr';
+    cmd_list[5] := 'clearscr';
     symbols := ['a'..'z','0' .. '9',' ','-'];
 end.
