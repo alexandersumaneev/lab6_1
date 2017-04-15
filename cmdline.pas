@@ -182,7 +182,7 @@ begin
     add_list(cmdstr,prev_cmd_list);
     curr_cmd := prev_cmd_list;
     del_spaces(cmdstr);
-    if not ExecRegExpr('(clearscr|help|print|delete|insert|find).*',cmdstr) Then
+    if not ExecRegExpr('(clearscr|help|print|delete|insert|find)((\s.*)|$)',cmdstr) Then
     begin
         //Если команда не соответствует регулярному выражению expr
         writeln(#10#13,'Команда   *',cmdstr,'*  не найдена');
@@ -242,6 +242,17 @@ begin
     curr_cmd := next_cmd(curr_cmd);
 end;
 
+procedure arrow_left();
+begin
+    gotoxy(wherex - 1,wherey);
+end;
+
+procedure arrow_right();
+begin
+    if wherex < 79 then
+        gotoxy(wherex + 1,wherey);
+end;
+
 Procedure backspace();
 Begin
     delete(cmdstr,length(cmdstr),1);
@@ -252,8 +263,9 @@ End;
 procedure key_press();
 var
     key: char;
+    p: integer;
 begin
-    if Length(cmdstr) > 80 then //Если слишком много вбили в консоль
+    if wherex > 80 then //Если слишком много вбили в консоль
     begin
         WriteLn(#10#13,'Максимальная длина строки 80 символов');
         cmdstr := '';
@@ -263,8 +275,12 @@ begin
         key := readkey();
         If (key in symbols) Then
         Begin
-            write(key);
-            cmdstr := cmdstr + key;
+            p := wherex;
+            insert(key,cmdstr,p);
+            delline;
+            gotoxy(1,wherey);
+            Write(cmdstr);
+            gotoxy(p + 1,wherey);
         End;
         If (key = #27) Then //Esc
             exit_f();
@@ -278,6 +294,8 @@ begin
             Case readkey() Of
             #72: arrow_up();
             #80: arrow_down();
+            #75: arrow_left();
+            #77: arrow_right();
             End;
     end;
 end;
