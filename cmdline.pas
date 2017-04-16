@@ -1,11 +1,7 @@
 {$mode objfpc}
 {$H+}
 {$codepage UTF8}
-(*
- * Project: lab6_1
- * User: alexander_sumaneev
- * Date: 07.04.2017
- *)
+
 unit cmdline;
 
 interface
@@ -21,8 +17,9 @@ const
 var
     cmdstr: string;
     symbols: set Of Char;
-    cmd_list: array[0..5] of string; //Список доступных команд
-    prev_cmd_list, curr_cmd: PCList;
+    cmd_list: array[1..6] of string; //Список доступных команд
+    prev_cmd: array[1..1000] of string;
+    n_cmd, i_cmd: integer;
     my_tree: PTree;
 
 procedure help();
@@ -99,17 +96,10 @@ end;
 
 procedure print_f(arg: string);
 begin
-    if not ExecRegExpr('(pre|inf|pos)$', arg) then
-        WriteLn('Недопустимый аргумент команды print')
+    if arg <> '' then
+        WriteLn('У команды print нет аргументов')
     else
-    begin
-        if arg = 'inf' then
-            print_tree_inf(my_tree);
-        if arg = 'pre' then
-            print_tree_pre(my_tree);
-        if arg = 'pos' then
-            print_tree_pos(my_tree);
-    end;
+        print_tree(my_tree);
 end;
 
 procedure help_f(arg: string);
@@ -139,18 +129,23 @@ var
 
 procedure cmd_exec();
 begin
-    if cmd = 'delete' then
-        delete_f(cmd_arg);
-    if cmd = 'insert' then
-        insert_f(cmd_arg);
-    if cmd = 'find' then
-        find_f(cmd_arg);
-    if cmd = 'print' then
-        print_f(cmd_arg);
-    if cmd = 'help' then
-        help_f(cmd_arg);
-    if cmd = 'clearscr' then
-        clear_f(cmd_arg);
+    if not ExecRegExpr('(clearscr|help|print|delete|insert|find)((\s.*)|$)',cmd) then
+        writeln(#10#13,'Команда   *',cmdstr,'*  не найдена')
+    else
+    begin
+        if cmd = 'delete' then
+            delete_f(cmd_arg);
+        if cmd = 'insert' then
+            insert_f(cmd_arg);
+        if cmd = 'find' then
+            find_f(cmd_arg);
+        if cmd = 'print' then
+            print_f(cmd_arg);
+        if cmd = 'help' then
+            help_f(cmd_arg);
+        if cmd = 'clearscr' then
+            clear_f(cmd_arg);
+    end;
 end;
 
 begin
@@ -172,42 +167,35 @@ end;
 
 procedure del_spaces(var cmd: string);
 begin
-    cmd := ReplaceRegExpr('(^\s*)|(\s*$)/(\s\s)',cmd,'',false);
     cmd := ReplaceRegExpr('\s+',cmd,' ',false);
-    cmd := ReplaceRegExpr('\s$',cmd,'',false);
+    cmd := ReplaceRegExpr('(^\s)|(\s$)',cmd,'',false);
 end;
 
-procedure enter();
+procedure enter(); //ok
 begin
-    add_list(cmdstr,prev_cmd_list);
-    curr_cmd := prev_cmd_list;
+    n_cmd += 1;
+    i_cmd := n_cmd + 1;
+    prev_cmd[n_cmd] := cmdstr;
     del_spaces(cmdstr);
-    if not ExecRegExpr('(clearscr|help|print|delete|insert|find)((\s.*)|$)',cmdstr) Then
-    begin
-        //Если команда не соответствует регулярному выражению expr
-        writeln(#10#13,'Команда   *',cmdstr,'*  не найдена');
-        cmdstr := '';
-    end
-    else
-    begin
-        split();
-        cmdstr := '';
-        WriteLn();
-    end;
+    split();
+    cmdstr := '';
+    WriteLn();
 end;
 
-procedure tab();
+procedure tab(); //ok
 var
     i: Integer;
+    s: string;
 begin
-    del_spaces(cmdstr);
-    for i:=0 to 5 do
+    s := cmdstr;
+    del_spaces(s);
+    for i:=1 to 6 do
     begin
-        if pos(cmdstr,cmd_list[i]) = 1 then //Если нашли команду в списке команд
+        if pos(s,cmd_list[i]) = 1 then //Если нашли команду в списке команд
         begin
-            cmdstr := cmd_list[i] + ' ';
-            delline;
             gotoxy(1,wherey);
+            clreol;
+            cmdstr := cmd_list[i] + ' ';
             Write(cmdstr);
             break;
         end;
@@ -216,88 +204,96 @@ end;
 
 procedure exit_f();
 begin
-    del_list(prev_cmd_list);
     delete_tree(my_tree);
-    WriteLn(#10#13,'Программа завершена');
-    readkey;
     halt();
 end;
 
-
-procedure arrow_up(); //Выводит предыдущую команду
+procedure arrow_up(); //ok
 begin
-    cmdstr := get_cmd(curr_cmd);
+
+    if i_cmd > 1 then
+    begin
+        dec(i_cmd);
+        cmdstr := prev_cmd[i_cmd];
+    end;
     gotoxy(1,wherey);
     clreol;
-    write(cmdstr);
-    curr_cmd := prev_cmd(curr_cmd);
+    Write(cmdstr);
 end;
 
-procedure arrow_down(); //Выводит предыдущую команду
+procedure arrow_down(); //ok
 begin
-    cmdstr := get_cmd(curr_cmd);
+    if i_cmd <> n_cmd  then
+    begin
+        inc(i_cmd);
+        cmdstr := prev_cmd[i_cmd];
+    end;
     gotoxy(1,wherey);
     clreol;
-    write(cmdstr);
-    curr_cmd := next_cmd(curr_cmd);
+    Write(cmdstr);
 end;
 
-procedure arrow_left();
+procedure arrow_left(); //ok
 begin
     gotoxy(wherex - 1,wherey);
 end;
 
-procedure arrow_right();
+procedure arrow_right(); //ok
 begin
-    if wherex < 79 then
+    if wherex <= Length(cmdstr) then
         gotoxy(wherex + 1,wherey);
 end;
 
-Procedure backspace();
+Procedure backspace(); //ok
+var
+    x, y, l: integer;
 Begin
-    delete(cmdstr,length(cmdstr),1);
-    gotoxy(wherex - 1,wherey);
+    x := wherex;
+    y := wherey;
+    delete(cmdstr,x - 1,1);
+    l := Length(cmdstr);
+    gotoxy(x - 1,y);
     clreol;
+    write(copy(cmdstr,x - 1,l));
+    gotoxy(x - 1,y);
 End;
 
-procedure key_press();
+procedure key_press(); //ok
 var
     key: char;
-    p: integer;
+    x: integer;
 begin
-    if wherex > 80 then //Если слишком много вбили в консоль
+    if Length(cmdstr) > 50 then
     begin
-        WriteLn(#10#13,'Максимальная длина строки 80 символов');
+        WriteLn;
         cmdstr := '';
-    end
-    else
-    begin
-        key := readkey();
-        If (key in symbols) Then
-        Begin
-            p := wherex;
-            insert(key,cmdstr,p);
-            delline;
-            gotoxy(1,wherey);
-            Write(cmdstr);
-            gotoxy(p + 1,wherey);
-        End;
-        If (key = #27) Then //Esc
-            exit_f();
-        If (key = #13) Then
-            enter();
-        If (key = #9) then
-            tab();
-        If (key = #8) Then
-            backspace();
-        If (key = #0) Then
-            Case readkey() Of
-            #72: arrow_up();
-            #80: arrow_down();
-            #75: arrow_left();
-            #77: arrow_right();
-            End;
+        Sound(440);
+        Delay(300);
+        NoSound;
     end;
+    key := readkey();
+    If (key in symbols) Then
+    Begin
+        x := wherex;
+        insert(key,cmdstr,x);
+        write(copy(cmdstr,x,Length(cmdstr)));
+        gotoxy(x + 1,wherey);
+    End;
+    If (key = #27) Then
+        exit_f();
+    If (key = #13) Then
+        enter();
+    If (key = #9) then
+        tab();
+    If (key = #8) Then
+        backspace();
+    If (key = #0) Then
+        Case readkey() Of
+        #72: arrow_up();
+        #80: arrow_down();
+        #75: arrow_left();
+        #77: arrow_right();
+        End;
 end;
 
 
@@ -309,16 +305,16 @@ begin
         key_press();
     end;
 end;
-
 begin
     my_tree := nil;
-    prev_cmd_list := nil;
-    curr_cmd := nil;
-    cmd_list[0] := 'help';
-    cmd_list[1] := 'insert';
-    cmd_list[2] := 'print';
-    cmd_list[3] := 'find';
-    cmd_list[4] := 'delete';
-    cmd_list[5] := 'clearscr';
+    n_cmd := 0;
+    cmdstr := '';
+    prev_cmd[1] := '';
+    cmd_list[1] := 'help';
+    cmd_list[2] := 'insert';
+    cmd_list[3] := 'print';
+    cmd_list[4] := 'find';
+    cmd_list[5] := 'delete';
+    cmd_list[6] := 'clearscr';
     symbols := ['a'..'z','0' .. '9',' ','-'];
 end.

@@ -1,11 +1,6 @@
 {$mode objfpc}
 {$H+}
 {$codepage UTF8}
-(*
- * Project: lab6_1
- *PTreeser: alexander_sumaneev
- * Date: 07.04.2017
- *)
 
 unit btree;
 
@@ -18,9 +13,7 @@ type
         left, right : PTree
     end;
     procedure insert_item(key: integer; var root : PTree); //Вставить элемент в дерево
-    procedure print_tree_inf(root : PTree); //Вывести элементы на экран в инфиксном порядке
-    procedure print_tree_pre(root : PTree); //Вывести элементы на экран в префикном порядке
-    procedure print_tree_pos(root : PTree); //Вывести элементы на экран в постфикном порядке
+    procedure print_tree(root : PTree); //Вывести элементы на экран в инфиксном порядке
     procedure delete_tree(var root: PTree); //Удалить все дерево
     function find_item(key: integer; root : PTree) : boolean;  //Найти элемент в дереве
     procedure delete_item(key: integer; var root: PTree);  //Удалить элемент из дерева
@@ -43,45 +36,17 @@ begin
             insert_item(key, root^.right);
 end;
 
-procedure print_tree_inf(root : PTree);
+procedure print_tree(root : PTree);
 begin
     if root = nil then
         WriteLn('Дерево пусто')
     else
     begin
         if root^.left <> nil then
-            print_tree_inf(root^.left);
+            print_tree(root^.left);
         Writeln(root^.key);
         if root^.right <> nil then
-            print_tree_inf(root^.right);
-    end;
-end;
-
-procedure print_tree_pre(root : PTree);
-begin
-    if root = nil then
-        WriteLn('Дерево пусто')
-    else
-    begin
-        Writeln(root^.key);
-        if root^.left <> nil then
-            print_tree_pre(root^.left);
-        if root^.right <> nil then
-            print_tree_pre(root^.right);
-    end;
-end;
-
-procedure print_tree_pos(root : PTree);
-begin
-    if root = nil then
-        WriteLn('Дерево пусто')
-    else
-    begin
-        if root^.left <> nil then
-            print_tree_pos(root^.left);
-        if root^.right <> nil then
-            print_tree_pos(root^.right);
-        Writeln(root^.key);
+            print_tree(root^.right);
     end;
 end;
 
